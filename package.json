@@ -1,0 +1,25 @@
+{
+  "name": "discrete-sim-docs",
+  "version": "1.0.0",
+  "description": "Documentation for discrete-sim package",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "keywords": [
+    "discrete-simulation",
+    "documentation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  },
+  "dependencies": {
+    "discrete-sim": "^0.1.1",
+    "echarts": "^6.0.0",
+    "vue-echarts": "^8.0.1"
+  }
+}
