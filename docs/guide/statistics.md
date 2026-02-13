@@ -63,6 +63,39 @@ const stdWait = stats.getStdDev('wait-time');
 const count = stats.getCount('wait-time');
 ```
 
+### Advanced Statistics
+
+For deeper analysis, enable sample tracking to access percentiles, histograms, and more:
+
+```typescript
+// Enable sample tracking for a metric
+stats.enableSampleTracking('wait-time');
+
+// Record samples (same as recordValue)
+stats.recordSample('wait-time', 12.5);
+stats.recordSample('wait-time', 8.3);
+stats.recordSample('wait-time', 15.2);
+
+// Percentiles (for SLA tracking)
+const p50 = stats.getPercentile('wait-time', 50);   // Median
+const p95 = stats.getPercentile('wait-time', 95);   // 95th percentile
+const p99 = stats.getPercentile('wait-time', 99);   // 99th percentile
+
+// Histogram distribution
+const histogram = stats.getHistogram('wait-time', 10);  // 10 bins
+histogram.forEach(bin => {
+  console.log(`${bin.min}-${bin.max}: ${bin.count} samples`);
+});
+
+// Variance and standard deviation
+const variance = stats.getVariance('wait-time');
+const stdDev = stats.getStdDev('wait-time');
+
+// Sample statistics
+const sampleMean = stats.getSampleMean('wait-time');
+const sampleCount = stats.getSampleCount('wait-time');
+```
+
 ### Time-Weighted Averages
 
 For metrics that change over time and should be weighted by duration:
@@ -204,6 +237,74 @@ console.log(`Average in use: ${stats.getTimeWeightedAverage('system-in-use').toF
 console.log(`Average queue: ${stats.getTimeWeightedAverage('system-queue').toFixed(2)}`);
 ```
 
+### Warm-up Periods
+
+Exclude initial transient behavior from statistics to get accurate steady-state results:
+
+```typescript
+const sim = new Simulation();
+const stats = sim.statistics;
+
+// Set warm-up period (exclude first 100 time units)
+stats.setWarmupPeriod(100);
+
+// Check if in warm-up
+if (stats.isInWarmup()) {
+  console.log('Still in warm-up period');
+}
+
+// Statistics automatically exclude warm-up period
+sim.run(500);
+
+const avgWait = stats.getAverage('wait-time');  // Only counts after time 100
+```
+
+### SLA Tracking Example
+
+```typescript
+function* customer(id: number, server: Resource, stats: Statistics) {
+  stats.enableSampleTracking('wait-time');
+
+  const arrivalTime = sim.now;
+  yield server.request();
+
+  const waitTime = sim.now - arrivalTime;
+  stats.recordSample('wait-time', waitTime);
+
+  yield* timeout(5);
+  server.release();
+}
+
+// After simulation
+const p95 = stats.getPercentile('wait-time', 95);
+const p99 = stats.getPercentile('wait-time', 99);
+
+console.log(`95% of customers waited less than ${p95.toFixed(2)} minutes`);
+console.log(`99% of customers waited less than ${p99.toFixed(2)} minutes`);
+
+// Check SLA: 95% of customers should wait < 10 minutes
+if (p95 < 10) {
+  console.log('✓ SLA met');
+} else {
+  console.log('✗ SLA violated');
+}
+```
+
+### Histogram Distribution Example
+
+```typescript
+stats.enableSampleTracking('service-time');
+
+// After simulation with many samples
+const histogram = stats.getHistogram('service-time', 10);
+
+console.log('\nService Time Distribution:');
+histogram.forEach(bin => {
+  const bar = '█'.repeat(Math.round(bin.count / 10));
+  console.log(`${bin.min.toFixed(1)}-${bin.max.toFixed(1)}: ${bar} (${bin.count})`);
+});
+```
+
 ## Best Practices
 
 ### Use Descriptive Names
@@ -285,6 +386,47 @@ stats.recordTimeWeighted(name: string, value: number): void
 stats.getTimeWeightedAverage(name: string): number
 ```
 
+### Advanced Statistics Methods
+
+```typescript
+// Sample tracking
+stats.enableSampleTracking(name: string): void
+stats.recordSample(name: string, value: number): void
+
+// Percentiles
+stats.getPercentile(name: string, percentile: number): number
+
+// Histogram
+stats.getHistogram(name: string, bins: number): HistogramBin[]
+
+interface HistogramBin {
+  min: number;
+  max: number;
+  count: number;
+  frequency: number;  // 0-1
+}
+
+// Variance
+stats.getVariance(name: string): number
+
+// Sample statistics
+stats.getSampleMean(name: string): number
+stats.getSampleCount(name: string): number
+```
+
+### Warm-up Period Methods
+
+```typescript
+// Set warm-up period end time
+stats.setWarmupPeriod(endTime: number): void
+
+// Get current warm-up period
+stats.getWarmupPeriod(): number
+
+// Check if still in warm-up
+stats.isInWarmup(): boolean
+```
+
 ### Clearing Statistics
 
 ```typescript
@@ -293,6 +435,16 @@ stats.clear();
 
 // Clear specific metric
 stats.clearMetric('wait-time');
+```
+
+### Export Methods
+
+```typescript
+// Export to JSON
+const json = stats.toJSON();
+
+// Export to CSV
+const csv = stats.toCSV();
 ```
 
 ## Common Metrics

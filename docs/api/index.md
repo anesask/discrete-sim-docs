@@ -6,26 +6,41 @@ Complete API documentation for `discrete-sim` - a discrete event simulation libr
 
 ```typescript
 import {
+  // Core classes
   Simulation,
   Process,
-  Resource,
   Statistics,
   Random,
+
+  // Resource types
+  Resource,
+  Buffer,
+  Store,
+
+  // Helper functions
   timeout,
   waitFor,
-  ValidationError
+
+  // Errors
+  ValidationError,
+  ConditionTimeoutError
 } from 'discrete-sim';
 ```
 
 ## Quick Reference
 
-### Classes
+### Core Classes
 
 - **[Simulation](./simulation)** - Main simulation engine managing event scheduling and execution
 - **[Process](./process)** - Process wrapper created by `sim.process()`
-- **[Resource](./resource)** - Limited-capacity resource with FIFO queuing
 - **[Statistics](./statistics)** - Data collection and analysis
 - **[Random](./random)** - Seedable random number generator
+
+### Resource Classes
+
+- **[Resource](./resource)** - Limited-capacity resource with FIFO queuing (servers, machines, workers)
+- **[Buffer](./buffer)** - Storage for homogeneous quantities (fuel, money, raw materials)
+- **[Store](./store)** - Storage for distinct objects with filter-based retrieval (pallets, vehicles, jobs)
 
 ### Helper Functions
 
@@ -110,9 +125,9 @@ process.cancel()          // Terminate process
 
 See [Process API](./process) for details.
 
-### Resource Class
+### Resource Classes
 
-Limited-capacity resource with queuing:
+**Resource** - Capacity-based resource:
 
 ```typescript
 const server = new Resource(sim, capacity, options?);
@@ -126,6 +141,39 @@ server.queueLength        // Waiting processes
 ```
 
 See [Resource API](./resource) for details.
+
+**Buffer** - Homogeneous quantity storage:
+
+```typescript
+const fuelTank = new Buffer(sim, capacity, options?);
+
+yield fuelTank.put(amount)    // Add tokens (waits if full)
+yield fuelTank.get(amount)    // Remove tokens (waits if empty)
+fuelTank.level                // Current quantity
+fuelTank.available            // Space remaining
+fuelTank.putQueueLength       // Waiting to put
+fuelTank.getQueueLength       // Waiting to get
+```
+
+See [Buffer API](./buffer) for details.
+
+**Store** - Distinct object storage:
+
+```typescript
+const warehouse = new Store<T>(sim, capacity, options?);
+
+yield warehouse.put(item)            // Store item (waits if full)
+const req = warehouse.get(filter?)   // Get item (waits if no match)
+yield req;
+const item = req.retrievedItem!;     // Retrieved item
+
+warehouse.size                // Current number of items
+warehouse.items               // Read-only array of items
+warehouse.putQueueLength      // Waiting to put
+warehouse.getQueueLength      // Waiting to get
+```
+
+See [Store API](./store) for details.
 
 ### Statistics Class
 
@@ -158,7 +206,8 @@ rng.uniform(min, max)                     // [min, max)
 rng.randInt(min, max)                     // [min, max) integers
 rng.exponential(mean)                     // Exponential
 rng.normal(mean, stdDev)                  // Normal/Gaussian
-rng.triangular(min, mode, max)            // Triangular
+rng.triangular(min, mode?, max)           // Triangular
+rng.poisson(lambda)                       // Poisson (discrete)
 rng.choice(array)                         // Random element
 rng.sample(array, k)                      // k random elements
 ```
@@ -226,6 +275,29 @@ try {
 - Negative or zero capacity for resources
 - Negative time values
 - Invalid random distribution parameters
+- Null or undefined items in Store
+
+### ConditionTimeoutError
+
+Thrown when `waitFor` exceeds maximum iterations:
+
+```typescript
+import { waitFor, ConditionTimeoutError } from 'discrete-sim';
+
+function* process() {
+  try {
+    yield* waitFor(
+      sim,
+      () => resource.available > 0,
+      { maxIterations: 100 }
+    );
+  } catch (error) {
+    if (error instanceof ConditionTimeoutError) {
+      console.log('Timeout waiting for resource');
+    }
+  }
+}
+```
 
 ## TypeScript Support
 
@@ -302,10 +374,18 @@ console.log(`Wait time: ${sim.statistics.getAverage('Server:wait-time')}`);
 
 ## Next Steps
 
+### Core API
 - **[Simulation](./simulation)** - Detailed simulation API
 - **[Process](./process)** - Process management
-- **[Resource](./resource)** - Resource handling
-- **[Statistics](./statistics)** - Data collection
+- **[Statistics](./statistics)** - Data collection and advanced statistics
 - **[Random](./random)** - Random number generation
+
+### Resources
+- **[Resource](./resource)** - Capacity-based resources
+- **[Buffer](./buffer)** - Homogeneous quantity storage
+- **[Store](./store)** - Distinct object storage
+
+### Guides & Examples
 - **[Guide](/guide/)** - Usage tutorials and patterns
+- **[Advanced Features](/guide/advanced)** - Event tracing, warm-up periods
 - **[Examples](/examples/)** - Complete simulation examples

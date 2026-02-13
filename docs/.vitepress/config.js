@@ -34,6 +34,7 @@ export default defineConfig({
           text: 'Advanced',
           items: [
             { text: 'Random Numbers', link: '/guide/random' },
+            { text: 'Advanced Features', link: '/guide/advanced' },
             { text: 'Error Handling', link: '/guide/errors' }
           ]
         }
@@ -41,14 +42,21 @@ export default defineConfig({
 
       '/api/': [
         {
-          text: 'API Reference',
+          text: 'Core API',
           items: [
             { text: 'Overview', link: '/api/' },
             { text: 'Simulation', link: '/api/simulation' },
             { text: 'Process', link: '/api/process' },
-            { text: 'Resource', link: '/api/resource' },
             { text: 'Statistics', link: '/api/statistics' },
             { text: 'Random', link: '/api/random' }
+          ]
+        },
+        {
+          text: 'Resources',
+          items: [
+            { text: 'Resource', link: '/api/resource' },
+            { text: 'Buffer', link: '/api/buffer' },
+            { text: 'Store', link: '/api/store' }
           ]
         }
       ],
@@ -64,6 +72,13 @@ export default defineConfig({
             { text: 'Restaurant', link: '/examples/restaurant' },
             { text: 'Warehouse Operations', link: '/examples/warehouse' },
             { text: 'Hospital Emergency Room', link: '/examples/hospital-emergency' }
+          ]
+        },
+        {
+          text: 'Resource Examples',
+          items: [
+            { text: 'Fuel Station (Buffer)', link: '/examples/fuel-station' },
+            { text: 'Warehouse Store (Store)', link: '/examples/warehouse-store' }
           ]
         }
       ]

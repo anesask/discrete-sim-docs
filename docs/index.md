@@ -15,6 +15,15 @@ hero:
 
 ---
 
+<p style="margin: 20px 0;">
+  <a href="https://www.npmjs.com/package/discrete-sim"><img src="https://img.shields.io/npm/v/discrete-sim?color=blue&label=version" alt="npm version" style="display: inline-block; margin: 4px;"></a>
+  <a href="https://www.npmjs.com/package/discrete-sim"><img src="https://img.shields.io/npm/dm/discrete-sim" alt="npm downloads" style="display: inline-block; margin: 4px;"></a>
+  <a href="https://github.com/anesask/discrete-sim/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/discrete-sim" alt="license" style="display: inline-block; margin: 4px;"></a>
+  <a href="https://github.com/anesask/discrete-sim"><img src="https://img.shields.io/github/stars/anesask/discrete-sim?style=social" alt="GitHub stars" style="display: inline-block; margin: 4px;"></a>
+  <a href="https://www.npmjs.com/package/discrete-sim"><img src="https://img.shields.io/badge/TypeScript-5.3+-blue" alt="TypeScript" style="display: inline-block; margin: 4px;"></a>
+  <a href="https://www.npmjs.com/package/discrete-sim"><img src="https://img.shields.io/badge/dependencies-0-brightgreen" alt="zero dependencies" style="display: inline-block; margin: 4px;"></a>
+</p>
+
 ## Installation
 
 ::: code-group
@@ -76,11 +85,17 @@ sim.run();
 ## Features
 
 - **Process-Based Modeling** - Use generator functions to describe processes naturally with intuitive yield syntax
-- **Resource Management** - Built-in support for shared resources with FIFO queuing and automatic statistics tracking
-- **Comprehensive Statistics** - Time-weighted averages, counters, and timeseries tracking for in-depth analysis
+- **Resource Management** - Built-in support for shared resources (Resources, Buffers, Stores) with FIFO queuing and automatic statistics tracking
+- **Buffer Resources** - Model homogeneous quantities like fuel, money, or raw materials with put/get operations
+- **Store Resources** - Manage collections of distinct objects with FIFO or filter-based retrieval
+- **Advanced Statistics** - Time-weighted averages, percentiles (P50, P95, P99), histograms, standard deviation, and comprehensive metrics
+- **Warm-up Periods** - Exclude initial transient behavior from statistical analysis for accurate steady-state results
+- **Event Tracing** - Detailed event execution logging for debugging and analysis
+- **Rich Random Distributions** - Exponential, normal, uniform, triangular, Poisson, and more with seedable RNG
 - **Reproducible Results** - Seedable random number generator for consistent experiments and validation
 - **TypeScript Native** - Full type safety and excellent IDE support for robust simulation development
 - **Zero Dependencies** - Lightweight and fast with no external dependencies
+- **Performance Optimized** - O(log n) priority queuing, cached statistics, and efficient algorithms
 
 ## Why `discrete-sim`?
 

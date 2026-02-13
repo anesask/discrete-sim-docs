@@ -134,6 +134,39 @@ function* task() {
 }
 ```
 
+## Poisson Distribution
+
+Generate random integers following a Poisson distribution. Useful for modeling discrete events in a fixed interval:
+
+```typescript
+// Average of 3 events per interval
+const count = rng.poisson(3);  // Returns integer: 0, 1, 2, 3, ...
+```
+
+**Use cases:**
+- Number of arrivals in a time period
+- Number of defects in a batch
+- Number of calls in an hour
+- Number of emails received per day
+
+```typescript
+// Batch processing: random number of items per batch
+function* processBatches() {
+  while (true) {
+    const batchSize = rng.poisson(10);  // Average 10 items
+    console.log(`Processing batch of ${batchSize} items`);
+
+    for (let i = 0; i < batchSize; i++) {
+      yield* timeout(1);  // Process each item
+    }
+
+    yield* timeout(5);  // Time between batches
+  }
+}
+```
+
+**Note:** Poisson distribution is discrete (returns integers), unlike exponential which is continuous.
+
 ## Discrete Distributions
 
 ### `choice(array)`
